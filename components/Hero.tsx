@@ -48,10 +48,10 @@ export default function Hero({ scrollY }: HeroProps) {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            Take Back Control
+            Take back control
             <br />
             <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-              of Your Phone
+              of your phone
             </span>
           </h1>
           
