@@ -1,22 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
-// For client-side auth state management only
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
 
-// Client-side Supabase client (minimal exposure)
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+// Single client for both client and server
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Server-side Supabase client for API routes
+// For server-side operations (same client, different context)
 export function createServerClient() {
-  const url = process.env.SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  
-  if (!url || !serviceKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
-  
-  return createClient(url, serviceKey, {
+  return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
