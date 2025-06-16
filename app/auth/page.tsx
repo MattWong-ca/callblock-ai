@@ -42,22 +42,22 @@ export default function AuthPage() {
     }
 
     try {
-      const { error } = isSignUp 
+      const result = isSignUp 
         ? await signUp(email, password)
         : await signIn(email, password);
 
-      if (error) {
+      if (result.error) {
         toast({
           title: "Error",
-          description: error.message,
+          description: result.error,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Success",
-          description: isSignUp 
+          description: result.message || (isSignUp 
             ? "Account created successfully! Please check your email to verify your account."
-            : "Signed in successfully!",
+            : "Signed in successfully!"),
         });
         if (!isSignUp) {
           router.push('/dashboard');
@@ -77,21 +77,22 @@ export default function AuthPage() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      const { error } = await signInWithGoogle();
-      if (error) {
+      const result = await signInWithGoogle();
+      if (result.error) {
         toast({
           title: "Error",
-          description: error.message,
+          description: result.error,
           variant: "destructive",
         });
+        setLoading(false);
       }
+      // If successful, the user will be redirected to Google OAuth
     } catch (error) {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };

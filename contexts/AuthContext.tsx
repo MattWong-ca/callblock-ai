@@ -8,10 +8,10 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error?: string; message?: string }>;
+  signIn: (email: string, password: string) => Promise<{ error?: string; message?: string }>;
+  signInWithGoogle: () => Promise<{ error?: string; url?: string }>;
+  signOut: () => Promise<{ error?: string; message?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,34 +42,99 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error };
+      }
+
+      return { message: data.message };
+    } catch (error) {
+      return { error: 'Network error occurred' };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error };
+      }
+
+      // The auth state will be updated automatically by the auth listener
+      return { message: data.message };
+    } catch (error) {
+      return { error: 'Network error occurred' };
+    }
   };
 
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    return { error };
+    try {
+      const response = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          redirectTo: `${window.location.origin}/auth/callback` 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error };
+      }
+
+      // Redirect to Google OAuth URL
+      if (data.url) {
+        window.location.href = data.url;
+      }
+
+      return { url: data.url };
+    } catch (error) {
+      return { error: 'Network error occurred' };
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    return { error };
+    try {
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error };
+      }
+
+      // The auth state will be updated automatically by the auth listener
+      return { message: data.message };
+    } catch (error) {
+      return { error: 'Network error occurred' };
+    }
   };
 
   const value = {
