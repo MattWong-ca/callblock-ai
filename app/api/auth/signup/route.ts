@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createServerClient } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,9 +12,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    const supabase = createServerClient();
+    
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
+      email_confirm: true, // Auto-confirm for development
     });
 
     if (error) {
@@ -29,6 +32,7 @@ export async function POST(request: NextRequest) {
       user: data.user,
     });
   } catch (error) {
+    console.error('Signup error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
