@@ -9,6 +9,7 @@ import HowItWorks from '@/components/HowItWorks';
 import SocialProof from '@/components/SocialProof';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
+import { Toaster } from '@/components/ui/toaster';
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
@@ -29,6 +30,7 @@ export default function Home() {
       <SocialProof />
       <CallToAction />
       <Footer />
+      <Toaster />
     </main>
   );
 }
