@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -22,24 +21,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Check for existing session on mount
+    checkSession();
   }, []);
+
+  const checkSession = async () => {
+    try {
+      const response = await fetch('/api/auth/session');
+      if (response.ok) {
+        const data = await response.json();
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+      }
+    } catch (error) {
+      console.error('Error checking session:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signUp = async (email: string, password: string) => {
     try {
@@ -79,7 +78,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: data.error };
       }
 
-      // The auth state will be updated automatically by the auth listener
+      // Update local state
+      setSession(data.session);
+      setUser(data.user);
+
       return { message: data.message };
     } catch (error) {
       return { error: 'Network error occurred' };
@@ -130,7 +132,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: data.error };
       }
 
-      // The auth state will be updated automatically by the auth listener
+      // Clear local state
+      setSession(null);
+      setUser(null);
+
       return { message: data.message };
     } catch (error) {
       return { error: 'Network error occurred' };
