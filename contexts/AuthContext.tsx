@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -21,42 +22,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session on mount
-    checkSession();
-  }, []);
-
-  const checkSession = async () => {
-    try {
-      const response = await fetch('/api/auth/session');
-      if (response.ok) {
-        const data = await response.json();
-        setSession(data.session);
-        setUser(data.session?.user ?? null);
-      }
-    } catch (error) {
-      console.error('Error checking session:', error);
-    } finally {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
       setLoading(false);
-    }
-  };
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const signUp = async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-        body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: data.error };
+      if (error) {
+        return { error: error.message };
       }
 
-      return { message: data.message };
+      return { message: 'Check your email to confirm your account!' };
     } catch (error) {
       return { error: 'Network error occurred' };
     }
@@ -64,25 +63,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: data.error };
+      if (error) {
+        return { error: error.message };
       }
 
-      // Update local state
-      setSession(data.session);
-      setUser(data.user);
-
-      return { message: data.message };
+      return { message: 'Signed in successfully!' };
     } catch (error) {
       return { error: 'Network error occurred' };
     }
@@ -90,25 +80,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      const response = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
-        body: JSON.stringify({ 
-          redirectTo: `${window.location.origin}/auth/callback` 
-        }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: data.error };
-      }
-
-      // Redirect to Google OAuth URL
-      if (data.url) {
-        window.location.href = data.url;
+      if (error) {
+        return { error: error.message };
       }
 
       return { url: data.url };
@@ -119,24 +99,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const response = await fetch('/api/auth/signout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const { error } = await supabase.auth.signOut();
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: data.error };
+      if (error) {
+        return { error: error.message };
       }
 
-      // Clear local state
-      setSession(null);
-      setUser(null);
-
-      return { message: data.message };
+      return { message: 'Signed out successfully!' };
     } catch (error) {
       return { error: 'Network error occurred' };
     }

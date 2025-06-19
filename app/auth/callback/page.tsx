@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import { Shield } from 'lucide-react';
 
 export default function AuthCallback() {
@@ -10,11 +11,16 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Check if we have a session after OAuth callback
-        const response = await fetch('/api/auth/session');
-        const data = await response.json();
+        // Handle the OAuth callback
+        const { data, error } = await supabase.auth.getSession();
         
-        if (response.ok && data.session) {
+        if (error) {
+          console.error('Error during auth callback:', error);
+          router.push('/auth?error=callback_error');
+          return;
+        }
+
+        if (data.session) {
           router.push('/dashboard');
         } else {
           router.push('/auth');
