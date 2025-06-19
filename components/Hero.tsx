@@ -58,7 +58,7 @@ export default function Hero({ scrollY }: HeroProps) {
           <div className="max-w-3xl mx-auto mb-8">
             <p className="text-xl md:text-2xl text-blue-100 mb-4 leading-relaxed">
               <strong className="text-white">97% of Americans</strong> receive spam calls monthly. 
-              Your number is likely already in a scammer's database.
+              Your number is likely already in a scammer&apos;s database.
             </p>
             <p className="text-lg md:text-xl text-blue-200">
               But today, that changes.
