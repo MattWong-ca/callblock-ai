@@ -43,19 +43,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
-        return { error: error.message };
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error };
       }
 
-      return { message: 'Check your email to confirm your account!' };
+      return { message: data.message };
     } catch (error) {
       return { error: 'Network error occurred' };
     }
@@ -63,16 +65,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
-        return { error: error.message };
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error };
       }
 
-      return { message: 'Signed in successfully!' };
+      // The auth state will be updated automatically by the auth listener
+      return { message: data.message };
     } catch (error) {
       return { error: 'Network error occurred' };
     }
@@ -80,15 +88,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+      const response = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ 
+          redirectTo: `${window.location.origin}/auth/callback` 
+        }),
       });
 
-      if (error) {
-        return { error: error.message };
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error };
+      }
+
+      // Redirect to Google OAuth URL
+      if (data.url) {
+        window.location.href = data.url;
       }
 
       return { url: data.url };
@@ -99,13 +117,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if (error) {
-        return { error: error.message };
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error };
       }
 
-      return { message: 'Signed out successfully!' };
+      // The auth state will be updated automatically by the auth listener
+      return { message: data.message };
     } catch (error) {
       return { error: 'Network error occurred' };
     }
