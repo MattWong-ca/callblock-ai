@@ -4,7 +4,6 @@ import { Shield, Phone, Zap, CheckCircle, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Poppins } from "next/font/google"
-import Navbar from "@/components/Navbar"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,7 +23,7 @@ export default function LandingPage() {
         <div className="absolute top-1/3 right-1/3 w-10 h-10 bg-gray-200 rounded-full opacity-15"></div>
       </div>
 
-      <Navbar />
+      {/* <Navbar /> */}
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20 text-center relative z-10">
