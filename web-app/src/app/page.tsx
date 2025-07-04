@@ -1,103 +1,205 @@
-import Image from "next/image";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Shield, Phone, Zap, CheckCircle, ArrowRight, Wallet } from "lucide-react"
+import Link from "next/link"
+import { Poppins } from "next/font/google"
 
-export default function Home() {
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+})
+
+export default function LandingPage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className={`min-h-screen bg-[#f5f3f0] relative overflow-hidden ${poppins.className}`}>
+      {/* Background geometric shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-16 h-16 bg-gray-200 rounded-full opacity-30"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-gray-300 rounded-full opacity-20"></div>
+        <div className="absolute top-60 left-1/4 w-8 h-8 bg-gray-200 rounded-full opacity-25"></div>
+        <div className="absolute bottom-40 right-10 w-20 h-20 bg-gray-200 rounded-full opacity-20"></div>
+        <div className="absolute bottom-20 left-20 w-14 h-14 bg-gray-300 rounded-full opacity-30"></div>
+        <div className="absolute top-1/3 right-1/3 w-10 h-10 bg-gray-200 rounded-full opacity-15"></div>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Navigation */}
+      <nav className="bg-black text-white px-6 py-4">
+        <div className="max-w-8xl mx-auto flex items-center justify-between">
+          <div className="text-xl font-bold">CallBlock.ai</div>
+          <div className="flex items-center gap-6">
+            <Link href="/spam-registry" className="hover:text-gray-300 transition-colors">
+              Spam Registry
+            </Link>
+            <Button
+              variant="outline"
+              className="bg-transparent border-white text-white hover:bg-white hover:text-black"
+            >
+              <Wallet className="w-4 h-4 mr-2" />
+              Connect Wallet
+            </Button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20 text-center relative z-10">
+        <h1 className="text-6xl md:text-7xl font-bold text-black mt-20 mb-6 leading-tight">
+          AI phone numbers to prevent spams and scams
+        </h1>
+        <p className="text-xl text-gray-700 mb-12 max-w-2xl mx-auto">
+          Sign up for an AI proxy number that screens calls before they reach you
+        </p>
+        <Button size="lg" className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-4 text-lg font-semibold">
+          Sign up <ArrowRight className="w-5 h-5 ml-2" />
+        </Button>
+      </section>
+
+      {/* Problem Statement Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="bg-white p-8 rounded-2xl shadow-sm border-2 border-black">
+            <h2 className="text-3xl font-bold text-black mb-4">The Spam Problem</h2>
+            <p className="text-gray-700 text-lg leading-relaxed">
+              97% of Americans receive spam calls monthly. Your number is likely already in a scammer&apos;s database.
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <img
+              src="/placeholder.svg?height=300&width=400"
+              alt="Spam calls illustration"
+              className="rounded-2xl shadow-lg"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <h2 className="text-4xl font-bold text-black text-center mb-16">How It Works</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <div className="bg-pink-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Phone className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-black mb-4">1. Get Your AI Number</h3>
+            <p className="text-gray-700">Sign up and receive your dedicated AI proxy phone number</p>
+          </div>
+          <div className="text-center">
+            <div className="bg-pink-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Shield className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-black mb-4">2. AI Screens Calls</h3>
+            <p className="text-gray-700">Our AI analyzes incoming calls and identifies spam/scams</p>
+          </div>
+          <div className="text-center">
+            <div className="bg-pink-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-black mb-4">3. Only Real Calls Reach You</h3>
+            <p className="text-gray-700">Legitimate calls are forwarded while spam is blocked</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <h2 className="text-4xl font-bold text-black text-center mb-16">Benefits of Using CallBlock.ai</h2>
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card className="border-2 border-black bg-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <Shield className="w-6 h-6 text-pink-500" />
+                Advanced AI Protection
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-700">
+                Our AI learns and adapts to new spam patterns, providing cutting-edge protection against evolving
+                threats.
+              </CardDescription>
+            </CardContent>
+          </Card>
+          <Card className="border-2 border-black bg-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <Zap className="w-6 h-6 text-pink-500" />
+                Instant Call Screening
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-700">
+                Real-time analysis ensures legitimate calls reach you immediately while spam is blocked instantly.
+              </CardDescription>
+            </CardContent>
+          </Card>
+          <Card className="border-2 border-black bg-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <Phone className="w-6 h-6 text-pink-500" />
+                Keep Your Real Number Private
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-700">
+                Use your AI number publicly while keeping your personal number completely private and secure.
+              </CardDescription>
+            </CardContent>
+          </Card>
+          <Card className="border-2 border-black bg-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <CheckCircle className="w-6 h-6 text-pink-500" />
+                99.9% Spam Detection
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-700">
+                Industry-leading accuracy ensures you never miss important calls while blocking unwanted ones.
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <h2 className="text-4xl font-bold text-black text-center mb-16">Simple Pricing</h2>
+        <div className="flex justify-center">
+          <Card className="border-2 border-black bg-white max-w-md w-full">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-bold text-black">Pro Plan</CardTitle>
+              <div className="text-5xl font-bold text-pink-500 mt-4">
+                $9<span className="text-lg text-gray-600">/month</span>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>Unlimited call screening</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>AI-powered spam detection</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>Call forwarding to your real number</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>24/7 protection</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span>Detailed call reports</span>
+              </div>
+              <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white mt-6">
+                Get Started <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </div>
-  );
+  )
 }
