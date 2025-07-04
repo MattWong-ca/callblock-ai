@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BrowserProvider } from 'ethers'
+import { BrowserProvider, Contract } from 'ethers'
 import { Poppins } from "next/font/google"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, Phone, LayoutDashboard, FileText, Settings, CreditCard, AlertTriangle } from "lucide-react"
+import { Wallet, Phone, LayoutDashboard, FileText, Settings, CreditCard, AlertTriangle, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
 // Network specific configurations
@@ -14,21 +14,26 @@ const NETWORK_CONFIG = {
   "0xaa36a7": {
     name: "Sepolia",
     symbol: "ETH",
-    contractAddress: "0x16C31f51D2648f5942DeC7d779369aA09A72d827"
+    contractAddress: ""
   },
   // Flow EVM Testnet
   "0x221": {
     name: "Flow EVM Testnet",
     symbol: "FLOW",
-    contractAddress: "0x8a204761fFb6eDD676eC28849De46D5e59F87fE1"
+    contractAddress: "0xE9f4bFA4f4351eDD69AB7cAab516bdc73aA29922"
   },
   // Filecoin Calibration Testnet
   "0x4cb2f": {
     name: "Filecoin Calibration",
     symbol: "FIL",
-    contractAddress: "0xf46E84BDA472F1C9bA77017cCc97FD7a710A872e"
+    contractAddress: ""
   }
 }
+
+// Whitelisted wallet addresses
+const WHITELISTED_ADDRESSES = [
+  "0xB68918211aD90462FbCf75b77a30bF76515422CE",
+]
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -46,7 +51,9 @@ export default function PhoneNumbersPage() {
   const [, setAddress] = useState<string>('')
   const [isConnected, setIsConnected] = useState(false)
   const [showFlowAlert, setShowFlowAlert] = useState(false)
-  const [networkConfig, setNetworkConfig] = useState<typeof NETWORK_CONFIG["0xaa36a7"] | null>(null)
+  const [networkConfig, setNetworkConfig] = useState<typeof NETWORK_CONFIG["0x221"] | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [purchased, setPurchased] = useState(false)
   const [formData, setFormData] = useState({
     agentName: '',
     proxyNumber: '',
@@ -74,16 +81,61 @@ export default function PhoneNumbersPage() {
   }
 
   const handlePurchase = async () => {
+    if (typeof window.ethereum === 'undefined') {
+      alert('Please install MetaMask!')
+      return
+    }
+
     if (!networkConfig) {
       alert('Please switch to a supported network (Sepolia, Flow EVM Testnet, or Filecoin Calibration)')
       return
     }
-    
-    // TODO: Implement purchase function with networkConfig.contractAddress
-    console.log('Purchase function called with data:', formData)
-    console.log('Contract address:', networkConfig.contractAddress)
-    console.log('Network:', networkConfig.name)
-    alert(`Purchase function would be triggered here! Contract: ${networkConfig.contractAddress} on ${networkConfig.name}`)
+
+    // Get current wallet address
+    const provider = new BrowserProvider(window.ethereum)
+    const signer = await provider.getSigner()
+    const walletAddress = await signer.getAddress()
+    console.log(walletAddress)
+
+    // Check if wallet is whitelisted
+    if (!WHITELISTED_ADDRESSES.includes(walletAddress)) {
+      alert('CallBlock.ai is still in beta.Your wallet address is not whitelisted, please DM @mattwong_ca to be added!')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const provider = new BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner()
+      const contract = new Contract(networkConfig.contractAddress, [
+        "function purchaseProxyNumber() public payable"
+      ], signer)
+      
+      // Make payment to purchase the proxy number
+      const tx = await contract.purchaseProxyNumber({
+        value: BigInt(25000000000000000000)
+      })
+
+      await tx.wait()
+      
+      // Success! Set purchased state to true
+      setPurchased(true)
+      
+      // Reset form or redirect
+    //   setFormData({
+    //     agentName: '',
+    //     proxyNumber: '',
+    //     realNumber: '',
+    //     whitelistNumbers: '',
+    //     specialInstructions: ''
+    //   })
+      
+    } catch (error) {
+      console.error('Purchase error:', error)
+      alert('Error processing purchase. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -297,13 +349,21 @@ export default function PhoneNumbersPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-                  >
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Purchase Number - $9/month
-                  </Button>
+                  {purchased ? (
+                    <div className="flex items-center gap-2 text-green-600 font-semibold text-lg">
+                      <CheckCircle className="w-6 h-6" />
+                      Purchased
+                    </div>
+                  ) : (
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      {loading ? 'Processing...' : 'Purchase Number - $9/month'}
+                    </Button>
+                  )}
                 </div>
               </form>
             </CardContent>
