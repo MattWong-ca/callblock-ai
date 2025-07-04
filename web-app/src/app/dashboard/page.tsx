@@ -116,7 +116,7 @@ export default function DashboardPage() {
         <Sidebar />
         
         {/* Dashboard content for connected users */}
-        <div className="flex-1 p-16 ml-64 overflow-y-auto h-screen">
+        <div className="flex-1 p-16 ml-64">
           <div className="flex items-center justify-between mb-12">
             <div>
               <h1 className="text-4xl font-bold text-black mb-2">Welcome back!</h1>

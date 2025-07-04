@@ -141,7 +141,7 @@ export default function PhoneNumbersPage() {
         <Sidebar />
         
         {/* Phone Numbers content */}
-        <div className="flex-1 p-16 ml-64 overflow-y-auto h-screen">
+        <div className="flex-1 p-16 ml-64">
           <div className="mb-12">
             <div>
               <h1 className="text-4xl font-bold text-black mb-2">Add New Number</h1>
