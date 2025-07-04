@@ -5,7 +5,7 @@ import { BrowserProvider } from 'ethers'
 import { Poppins } from "next/font/google"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, Shield, Phone, CheckCircle } from "lucide-react"
+import { Wallet, Shield, Phone, CheckCircle, LayoutDashboard, FileText } from "lucide-react"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -88,21 +88,45 @@ export default function DashboardPage() {
     )
   }
 
+  const Sidebar = () => (
+    <div className="w-64 bg-white border-r-2 border-black min-h-[calc(100vh-80px)] ">
+      <div className="p-6">
+        <h2 className="text-xl font-bold text-black mb-8">Navigation</h2>
+        <nav className="space-y-2">
+          <div className="flex items-center gap-3 p-3 bg-pink-500 text-white font-semibold rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <LayoutDashboard className="w-5 h-5" />
+            Dashboard
+          </div>
+          <div className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors">
+            <Phone className="w-5 h-5 text-gray-600" />
+            Phone Numbers
+          </div>
+          <div className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors">
+            <FileText className="w-5 h-5 text-gray-600" />
+            Call Logs
+          </div>
+        </nav>
+      </div>
+    </div>
+  )
+
   return (
     <div className={`min-h-[calc(100vh-80px)] bg-[#f5f3f0] ${poppins.className}`}>
-      
-      {/* Dashboard content for connected users */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="flex items-center justify-between mb-12">
-          <div>
-            <h1 className="text-4xl font-bold text-black mb-2">Welcome back!</h1>
-            <p className="text-gray-700 text-lg">Connected: {address}</p>
+      <div className="flex">
+        <Sidebar />
+        
+        {/* Dashboard content for connected users */}
+        <div className="flex-1 p-16">
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <h1 className="text-4xl font-bold text-black mb-2">Welcome back!</h1>
+              <p className="text-gray-700 text-lg">Connected: {address}</p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-pink-500">+1 (555) 123-4567</div>
+              <div className="text-sm text-gray-600">Your AI Number</div>
+            </div>
           </div>
-          <div className="text-right">
-            <div className="text-2xl font-bold text-pink-500">+1 (555) 123-4567</div>
-            <div className="text-sm text-gray-600">Your AI Number</div>
-          </div>
-        </div>
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -183,6 +207,7 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   )
