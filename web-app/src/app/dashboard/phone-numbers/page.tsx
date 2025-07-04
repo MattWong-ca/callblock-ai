@@ -142,21 +142,14 @@ export default function PhoneNumbersPage() {
         
         {/* Phone Numbers content */}
         <div className="flex-1 p-16 ml-64">
-          <div className="mb-12">
+          <div className="mb-8">
             <div>
-              <h1 className="text-4xl font-bold text-black mb-2">Add New Number</h1>
-              <p className="text-gray-700 text-lg">Purchase a new AI proxy number</p>
+              <h1 className="text-4xl font-bold text-black">Add New Number</h1>
             </div>
           </div>
 
           {/* Purchase Form */}
           <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] mb-12">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <CreditCard className="w-6 h-6 text-pink-500" />
-                Purchase New AI Number
-              </CardTitle>
-            </CardHeader>
             <CardContent>
               <form onSubmit={handleFormSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
@@ -197,11 +190,11 @@ export default function PhoneNumbersPage() {
                     Your Real Number (AI will transfer to this number)
                   </label>
                   <input
-                    type="tel"
+                    type="password"
                     value={formData.realNumber}
                     onChange={(e) => handleInputChange('realNumber', e.target.value)}
                     placeholder="+1 (555) 123-4567"
-                    className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500 font-mono"
                     required
                   />
                 </div>
@@ -214,7 +207,7 @@ export default function PhoneNumbersPage() {
                     value={formData.whitelistNumbers}
                     onChange={(e) => handleInputChange('whitelistNumbers', e.target.value)}
                     placeholder="Enter phone numbers that should always be forwarded, one per line"
-                    rows={3}
+                    rows={1}
                     className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
                   />
                 </div>
