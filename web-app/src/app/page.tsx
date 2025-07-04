@@ -4,6 +4,7 @@ import { Shield, Phone, Zap, CheckCircle, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Poppins } from "next/font/google"
+import Navbar from "@/components/Navbar"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -23,23 +24,7 @@ export default function LandingPage() {
         <div className="absolute top-1/3 right-1/3 w-10 h-10 bg-gray-200 rounded-full opacity-15"></div>
       </div>
 
-      {/* Navigation */}
-      <nav className="bg-black text-white px-6 py-4">
-        <div className="max-w-8xl mx-auto flex items-center justify-between">
-          <div className="text-xl font-bold">CallBlock.ai</div>
-          <div className="flex items-center gap-6">
-            <Link href="/spam-registry" className="hover:text-gray-300 transition-colors">
-              Spam Registry
-            </Link>
-            <Button
-              variant="outline"
-              className="bg-transparent border-white font-bold text-white hover:bg-white hover:text-black rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-            >
-              Connect Wallet
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20 text-center relative z-10">
@@ -50,12 +35,14 @@ export default function LandingPage() {
           Sign up for an AI proxy number that screens calls before they reach you
         </p>
         <div className="flex gap-10 justify-center">
-          <Button size="lg" className="text-xl bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 font-semibold rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-            Sign up <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-          <div className="flex items-center mt-1 text-xl font-bold text-black">
+          <Link href="/dashboard">
+            <Button size="lg" className="text-xl bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 font-semibold rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+              Sign up <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </Link>
+          <Link href="/dashboard" className="flex items-center mt-1 text-xl font-bold text-black hover:text-gray-700 transition-colors">
             Go to dashboard <ArrowRight className="w-5 h-5 ml-2" />
-          </div>
+          </Link>
         </div>
       </section>
 
@@ -200,9 +187,11 @@ export default function LandingPage() {
                 <CheckCircle className="w-5 h-5 text-green-500" />
                 <span>Detailed call reports</span>
               </div>
-              <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white mt-6 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                Get Started <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+              <Link href="/dashboard">
+                <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white mt-6 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                  Get Started <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
