@@ -5,8 +5,30 @@ import { BrowserProvider } from 'ethers'
 import { Poppins } from "next/font/google"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, Phone, LayoutDashboard, FileText, Settings, CreditCard } from "lucide-react"
+import { Wallet, Phone, LayoutDashboard, FileText, Settings, CreditCard, AlertTriangle } from "lucide-react"
 import Link from "next/link"
+
+// Network specific configurations
+const NETWORK_CONFIG = {
+  // Sepolia
+  "0xaa36a7": {
+    name: "Sepolia",
+    symbol: "ETH",
+    contractAddress: "0x16C31f51D2648f5942DeC7d779369aA09A72d827"
+  },
+  // Flow EVM Testnet
+  "0x221": {
+    name: "Flow EVM Testnet",
+    symbol: "FLOW",
+    contractAddress: "0x8a204761fFb6eDD676eC28849De46D5e59F87fE1"
+  },
+  // Filecoin Calibration Testnet
+  "0x4cb2f": {
+    name: "Filecoin Calibration",
+    symbol: "FIL",
+    contractAddress: "0xf46E84BDA472F1C9bA77017cCc97FD7a710A872e"
+  }
+}
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -23,6 +45,8 @@ declare global {
 export default function PhoneNumbersPage() {
   const [, setAddress] = useState<string>('')
   const [isConnected, setIsConnected] = useState(false)
+  const [showFlowAlert, setShowFlowAlert] = useState(false)
+  const [networkConfig, setNetworkConfig] = useState<typeof NETWORK_CONFIG["0xaa36a7"] | null>(null)
   const [formData, setFormData] = useState({
     agentName: '',
     proxyNumber: '',
@@ -50,9 +74,16 @@ export default function PhoneNumbersPage() {
   }
 
   const handlePurchase = async () => {
-    // TODO: Implement purchase function
+    if (!networkConfig) {
+      alert('Please switch to a supported network (Sepolia, Flow EVM Testnet, or Filecoin Calibration)')
+      return
+    }
+    
+    // TODO: Implement purchase function with networkConfig.contractAddress
     console.log('Purchase function called with data:', formData)
-    alert('Purchase function would be triggered here!')
+    console.log('Contract address:', networkConfig.contractAddress)
+    console.log('Network:', networkConfig.name)
+    alert(`Purchase function would be triggered here! Contract: ${networkConfig.contractAddress} on ${networkConfig.name}`)
   }
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -78,6 +109,23 @@ export default function PhoneNumbersPage() {
             const address = await accounts[0].getAddress()
             setAddress(address)
             setIsConnected(true)
+            
+            // Check network and set config
+            const network = await provider.getNetwork()
+            const chainId = "0x" + network.chainId.toString(16)
+            const config = NETWORK_CONFIG[chainId as keyof typeof NETWORK_CONFIG]
+            
+            if (config) {
+              setNetworkConfig(config)
+              
+              // Show alert if not on supported network
+              if (!["0xaa36a7", "0x221", "0x4cb2f"].includes(chainId)) {
+                setShowFlowAlert(true)
+              }
+            } else {
+              setNetworkConfig(null)
+              setShowFlowAlert(true)
+            }
           }
         } catch (error) {
           console.error('Error checking wallet connection:', error)
@@ -142,6 +190,29 @@ export default function PhoneNumbersPage() {
         
         {/* Phone Numbers content */}
         <div className="flex-1 p-16 ml-64">
+          {/* Flow Network Alert */}
+          {showFlowAlert && (
+            <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-500 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                <div>
+                  <h3 className="font-semibold text-yellow-800">Switch to Flow Network</h3>
+                  <p className="text-sm text-yellow-700">
+                    Please switch to a supported network (Sepolia, Flow EVM Testnet, or Filecoin Calibration) to purchase phone numbers.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => setShowFlowAlert(false)}
+                  size="sm" 
+                  variant="outline" 
+                  className="ml-auto border-yellow-500 text-yellow-700 hover:bg-yellow-100 rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+          )}
+          
           <div className="mb-8">
             <div>
               <h1 className="text-4xl font-bold text-black">Add New Number</h1>
@@ -161,7 +232,7 @@ export default function PhoneNumbersPage() {
                       type="text"
                       value={formData.agentName}
                       onChange={(e) => handleInputChange('agentName', e.target.value)}
-                      placeholder="e.g., Personal Assistant, Business Line"
+                      placeholder="Matt's Assistant"
                       className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
                       required
                     />
@@ -206,7 +277,7 @@ export default function PhoneNumbersPage() {
                   <textarea
                     value={formData.whitelistNumbers}
                     onChange={(e) => handleInputChange('whitelistNumbers', e.target.value)}
-                    placeholder="Enter phone numbers that should always be forwarded, one per line"
+                    placeholder="Enter phone numbers that should always be forwarded, separated by commas"
                     rows={1}
                     className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
                   />
