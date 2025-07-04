@@ -39,7 +39,7 @@ export default function PhoneNumbersPage() {
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner()
         const address = await signer.getAddress()
-        setAddress(address.slice(0, 6) + '...' + address.slice(-4))
+        setAddress(address)
         setIsConnected(true)
       } else {
         alert('Please install MetaMask!')
@@ -76,7 +76,7 @@ export default function PhoneNumbersPage() {
           const accounts = await provider.listAccounts()
           if (accounts.length > 0) {
             const address = await accounts[0].getAddress()
-            setAddress(address.slice(0, 6) + '...' + address.slice(-4))
+            setAddress(address)
             setIsConnected(true)
           }
         } catch (error) {

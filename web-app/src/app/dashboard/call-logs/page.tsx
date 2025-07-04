@@ -32,7 +32,7 @@ export default function CallLogsPage() {
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner()
         const address = await signer.getAddress()
-        setAddress(address.slice(0, 6) + '...' + address.slice(-4))
+        setAddress(address)
         setIsConnected(true)
       } else {
         alert('Please install MetaMask!')
@@ -51,7 +51,7 @@ export default function CallLogsPage() {
           const accounts = await provider.listAccounts()
           if (accounts.length > 0) {
             const address = await accounts[0].getAddress()
-            setAddress(address.slice(0, 6) + '...' + address.slice(-4))
+            setAddress(address)
             setIsConnected(true)
           }
         } catch (error) {
@@ -222,34 +222,6 @@ export default function CallLogsPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Statistics */}
-          <div className="grid md:grid-cols-4 gap-6 mt-8">
-            <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-red-500 mb-2">47</div>
-                <div className="text-sm text-gray-600">Calls Blocked</div>
-              </CardContent>
-            </Card>
-            <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-green-500 mb-2">12</div>
-                <div className="text-sm text-gray-600">Calls Forwarded</div>
-              </CardContent>
-            </Card>
-            <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-yellow-500 mb-2">3</div>
-                <div className="text-sm text-gray-600">Calls Screened</div>
-              </CardContent>
-            </Card>
-            <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-blue-500 mb-2">98%</div>
-                <div className="text-sm text-gray-600">AI Accuracy</div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </div>
