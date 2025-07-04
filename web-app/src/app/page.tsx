@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, Phone, Zap, CheckCircle, ArrowRight, Wallet } from "lucide-react"
+import { Shield, Phone, Zap, CheckCircle, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { Poppins } from "next/font/google"
 
 const poppins = Poppins({
@@ -32,9 +33,8 @@ export default function LandingPage() {
             </Link>
             <Button
               variant="outline"
-              className="bg-transparent border-white text-white hover:bg-white hover:text-black"
+              className="bg-transparent border-white font-bold text-white hover:bg-white hover:text-black rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
             >
-              <Wallet className="w-4 h-4 mr-2" />
               Connect Wallet
             </Button>
           </div>
@@ -49,25 +49,32 @@ export default function LandingPage() {
         <p className="text-xl text-gray-700 mb-12 max-w-2xl mx-auto">
           Sign up for an AI proxy number that screens calls before they reach you
         </p>
-        <Button size="lg" className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-4 text-lg font-semibold">
-          Sign up <ArrowRight className="w-5 h-5 ml-2" />
-        </Button>
+        <div className="flex gap-10 justify-center">
+          <Button size="lg" className="text-xl bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 font-semibold rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            Sign up <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+          <div className="flex items-center mt-1 text-xl font-bold text-black">
+            Go to dashboard <ArrowRight className="w-5 h-5 ml-2" />
+          </div>
+        </div>
       </section>
 
       {/* Problem Statement Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="bg-white p-8 rounded-2xl shadow-sm border-2 border-black">
+          <div className="bg-white p-8 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] border-2 border-black">
             <h2 className="text-3xl font-bold text-black mb-4">The Spam Problem</h2>
             <p className="text-gray-700 text-lg leading-relaxed">
-              97% of Americans receive spam calls monthly. Your number is likely already in a scammer&apos;s database.
+              Americans lost $12.5 billion to phone scams in 2024. The average victim loses $1,400.<br /><br />Your number is likely already in a scammer&apos;s database.
             </p>
           </div>
           <div className="flex justify-center">
-            <img
-              src="/placeholder.svg?height=300&width=400"
-              alt="Spam calls illustration"
-              className="rounded-2xl shadow-lg"
+            <Image
+              src="https://static1.howtogeekimages.com/wordpress/wp-content/uploads/2021/12/smartphone_alert_hero_1200x675.jpg"
+              alt="Smartphone with spam alert notification"
+              width={400}
+              height={300}
+              className="rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] w-full max-w-md"
             />
           </div>
         </div>
@@ -78,25 +85,25 @@ export default function LandingPage() {
         <h2 className="text-4xl font-bold text-black text-center mb-16">How It Works</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="text-center">
-            <div className="bg-pink-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="bg-pink-500 w-16 h-16 rounded-none flex items-center justify-center mx-auto mb-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               <Phone className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-black mb-4">1. Get Your AI Number</h3>
             <p className="text-gray-700">Sign up and receive your dedicated AI proxy phone number</p>
           </div>
           <div className="text-center">
-            <div className="bg-pink-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="bg-pink-500 w-16 h-16 rounded-none flex items-center justify-center mx-auto mb-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               <Shield className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-black mb-4">2. AI Screens Calls</h3>
-            <p className="text-gray-700">Our AI analyzes incoming calls and identifies spam/scams</p>
+            <p className="text-gray-700">Your custom AI agent analyzes incoming calls and identifies spam/scams</p>
           </div>
           <div className="text-center">
-            <div className="bg-pink-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="bg-pink-500 w-16 h-16 rounded-none flex items-center justify-center mx-auto mb-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-black mb-4">3. Only Real Calls Reach You</h3>
-            <p className="text-gray-700">Legitimate calls are forwarded while spam is blocked</p>
+            <p className="text-gray-700">Legitimate calls are forwarded to your real number, while spam is blocked</p>
           </div>
         </div>
       </section>
@@ -105,55 +112,55 @@ export default function LandingPage() {
       <section className="max-w-7xl mx-auto px-6 py-20">
         <h2 className="text-4xl font-bold text-black text-center mb-16">Benefits of Using CallBlock.ai</h2>
         <div className="grid md:grid-cols-2 gap-8">
-          <Card className="border-2 border-black bg-white">
-            <CardHeader>
+          <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <CardHeader className="text-xl">
               <CardTitle className="flex items-center gap-3">
                 <Shield className="w-6 h-6 text-pink-500" />
                 Advanced AI Protection
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-gray-700">
+              <CardDescription className="text-gray-700 text-md">
                 Our AI learns and adapts to new spam patterns, providing cutting-edge protection against evolving
                 threats.
               </CardDescription>
             </CardContent>
           </Card>
-          <Card className="border-2 border-black bg-white">
-            <CardHeader>
+          <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <CardHeader className="text-xl">
               <CardTitle className="flex items-center gap-3">
                 <Zap className="w-6 h-6 text-pink-500" />
                 Instant Call Screening
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-gray-700">
+              <CardDescription className="text-gray-700 text-md">
                 Real-time analysis ensures legitimate calls reach you immediately while spam is blocked instantly.
               </CardDescription>
             </CardContent>
           </Card>
-          <Card className="border-2 border-black bg-white">
-            <CardHeader>
+          <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <CardHeader className="text-xl">
               <CardTitle className="flex items-center gap-3">
                 <Phone className="w-6 h-6 text-pink-500" />
                 Keep Your Real Number Private
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-gray-700">
+              <CardDescription className="text-gray-700 text-md">
                 Use your AI number publicly while keeping your personal number completely private and secure.
               </CardDescription>
             </CardContent>
           </Card>
-          <Card className="border-2 border-black bg-white">
-            <CardHeader>
+          <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <CardHeader className="text-xl">
               <CardTitle className="flex items-center gap-3">
                 <CheckCircle className="w-6 h-6 text-pink-500" />
                 99.9% Spam Detection
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-gray-700">
+              <CardDescription className="text-gray-700 text-md">
                 Industry-leading accuracy ensures you never miss important calls while blocking unwanted ones.
               </CardDescription>
             </CardContent>
@@ -165,7 +172,7 @@ export default function LandingPage() {
       <section className="max-w-7xl mx-auto px-6 py-20">
         <h2 className="text-4xl font-bold text-black text-center mb-16">Simple Pricing</h2>
         <div className="flex justify-center">
-          <Card className="border-2 border-black bg-white max-w-md w-full">
+          <Card className="border-2 border-black bg-white max-w-md w-full rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold text-black">Pro Plan</CardTitle>
               <div className="text-5xl font-bold text-pink-500 mt-4">
@@ -193,7 +200,7 @@ export default function LandingPage() {
                 <CheckCircle className="w-5 h-5 text-green-500" />
                 <span>Detailed call reports</span>
               </div>
-              <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white mt-6">
+              <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white mt-6 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                 Get Started <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </CardContent>
