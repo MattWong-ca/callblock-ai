@@ -6,6 +6,7 @@ import { Poppins } from "next/font/google"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Wallet, Shield, Phone, CheckCircle, LayoutDashboard, FileText } from "lucide-react"
+import Link from "next/link"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -91,20 +92,19 @@ export default function DashboardPage() {
   const Sidebar = () => (
     <div className="w-64 bg-white border-r-2 border-black min-h-[calc(100vh-80px)] ">
       <div className="p-6">
-        <h2 className="text-xl font-bold text-black mb-8">Navigation</h2>
         <nav className="space-y-2">
           <div className="flex items-center gap-3 p-3 bg-pink-500 text-white font-semibold rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <LayoutDashboard className="w-5 h-5" />
             Dashboard
           </div>
-          <div className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors">
+          <Link href="/dashboard/phone-numbers" className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors">
             <Phone className="w-5 h-5 text-gray-600" />
             Phone Numbers
-          </div>
-          <div className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors">
+          </Link>
+          <Link href="/dashboard/call-logs" className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors">
             <FileText className="w-5 h-5 text-gray-600" />
             Call Logs
-          </div>
+          </Link>
         </nav>
       </div>
     </div>
