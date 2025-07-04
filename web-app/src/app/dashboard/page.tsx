@@ -90,7 +90,7 @@ export default function DashboardPage() {
   }
 
   const Sidebar = () => (
-    <div className="w-64 bg-white border-r-2 border-black min-h-[calc(100vh-80px)] ">
+    <div className="w-64 bg-white border-r-2 border-black h-screen fixed left-0 z-50">
       <div className="p-6">
         <nav className="space-y-2">
           <div className="flex items-center gap-3 p-3 bg-pink-500 text-white font-semibold rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
@@ -116,7 +116,7 @@ export default function DashboardPage() {
         <Sidebar />
         
         {/* Dashboard content for connected users */}
-        <div className="flex-1 p-16">
+        <div className="flex-1 p-16 ml-64 overflow-y-auto h-screen">
           <div className="flex items-center justify-between mb-12">
             <div>
               <h1 className="text-4xl font-bold text-black mb-2">Welcome back!</h1>

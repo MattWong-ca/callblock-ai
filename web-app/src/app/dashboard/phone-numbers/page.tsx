@@ -5,7 +5,7 @@ import { BrowserProvider } from 'ethers'
 import { Poppins } from "next/font/google"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, Shield, Phone, CheckCircle, LayoutDashboard, FileText, Plus, Settings } from "lucide-react"
+import { Wallet, Phone, LayoutDashboard, FileText, Settings, CreditCard } from "lucide-react"
 import Link from "next/link"
 
 const poppins = Poppins({
@@ -23,6 +23,13 @@ declare global {
 export default function PhoneNumbersPage() {
   const [, setAddress] = useState<string>('')
   const [isConnected, setIsConnected] = useState(false)
+  const [formData, setFormData] = useState({
+    agentName: '',
+    proxyNumber: '',
+    realNumber: '',
+    whitelistNumbers: '',
+    specialInstructions: ''
+  })
 
   const connectWallet = async () => {
     try {
@@ -40,6 +47,24 @@ export default function PhoneNumbersPage() {
     } catch (error) {
       console.error('Error connecting wallet:', error)
     }
+  }
+
+  const handlePurchase = async () => {
+    // TODO: Implement purchase function
+    console.log('Purchase function called with data:', formData)
+    alert('Purchase function would be triggered here!')
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handlePurchase()
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
   // Check if wallet is already connected on page load
@@ -90,7 +115,7 @@ export default function PhoneNumbersPage() {
   }
 
   const Sidebar = () => (
-    <div className="w-64 bg-white border-r-2 border-black min-h-[calc(100vh-80px)] ">
+    <div className="w-64 bg-white border-r-2 border-black h-screen fixed left-0 z-50">
       <div className="p-6">
         <nav className="space-y-2">
           <Link href="/dashboard" className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors">
@@ -116,141 +141,152 @@ export default function PhoneNumbersPage() {
         <Sidebar />
         
         {/* Phone Numbers content */}
-        <div className="flex-1 p-16">
-          <div className="flex items-center justify-between mb-12">
+        <div className="flex-1 p-16 ml-64 overflow-y-auto h-screen">
+          <div className="mb-12">
             <div>
-              <h1 className="text-4xl font-bold text-black mb-2">Phone Numbers</h1>
-              <p className="text-gray-700 text-lg">Manage your AI proxy numbers</p>
+              <h1 className="text-4xl font-bold text-black mb-2">Add New Number</h1>
+              <p className="text-gray-700 text-lg">Purchase a new AI proxy number</p>
             </div>
-            <Button className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <Plus className="w-5 h-5 mr-2" />
-              Add New Number
-            </Button>
           </div>
 
-          {/* Active Numbers */}
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center gap-3">
-                    <Phone className="w-6 h-6 text-pink-500" />
-                    Primary Number
-                  </span>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                      <Settings className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-pink-500 mb-4">+1 (555) 123-4567</div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Status:</span>
-                    <span className="text-green-600 font-semibold">Active</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Calls Blocked:</span>
-                    <span>47</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Calls Forwarded:</span>
-                    <span>12</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Created:</span>
-                    <span>Jan 15, 2024</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center gap-3">
-                    <Phone className="w-6 h-6 text-blue-500" />
-                    Business Number
-                  </span>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                      <Settings className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-500 mb-4">+1 (555) 987-6543</div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Status:</span>
-                    <span className="text-green-600 font-semibold">Active</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Calls Blocked:</span>
-                    <span>23</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Calls Forwarded:</span>
-                    <span>8</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Created:</span>
-                    <span>Feb 3, 2024</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Number Settings */}
-          <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+          {/* Purchase Form */}
+          <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] mb-12">
             <CardHeader>
-              <CardTitle>Number Settings</CardTitle>
+              <CardTitle className="flex items-center gap-3">
+                <CreditCard className="w-6 h-6 text-pink-500" />
+                Purchase New AI Number
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="font-semibold text-black mb-4">Forwarding Rules</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 border-l-4 border-pink-500">
-                      <div>
-                        <div className="font-semibold">Legitimate Calls</div>
-                        <div className="text-sm text-gray-600">Forward to your real number</div>
-                      </div>
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 border-l-4 border-red-500">
-                      <div>
-                        <div className="font-semibold">Spam Calls</div>
-                        <div className="text-sm text-gray-600">Block completely</div>
-                      </div>
-                      <Shield className="w-5 h-5 text-red-500" />
-                    </div>
+              <form onSubmit={handleFormSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-black mb-2">
+                      Name of Agent
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.agentName}
+                      onChange={(e) => handleInputChange('agentName', e.target.value)}
+                      placeholder="e.g., Personal Assistant, Business Line"
+                      className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-black mb-2">
+                      Choose AI Proxy Number
+                    </label>
+                    <select
+                      value={formData.proxyNumber}
+                      onChange={(e) => handleInputChange('proxyNumber', e.target.value)}
+                      className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      required
+                    >
+                      <option value="">Select a number</option>
+                      <option value="+1 (555) 111-2222">+1 (555) 111-2222</option>
+                      <option value="+1 (555) 333-4444">+1 (555) 333-4444</option>
+                      <option value="+1 (555) 555-6666">+1 (555) 555-6666</option>
+                      <option value="+1 (555) 777-8888">+1 (555) 777-8888</option>
+                    </select>
                   </div>
                 </div>
+
                 <div>
-                  <h3 className="font-semibold text-black mb-4">AI Screening</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Spam Detection</span>
-                      <span className="text-green-600 font-semibold">Enabled</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Voice Analysis</span>
-                      <span className="text-green-600 font-semibold">Enabled</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Call Recording</span>
-                      <span className="text-gray-400">Disabled</span>
-                    </div>
-                  </div>
+                  <label className="block text-sm font-semibold text-black mb-2">
+                    Your Real Number (AI will transfer to this number)
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.realNumber}
+                    onChange={(e) => handleInputChange('realNumber', e.target.value)}
+                    placeholder="+1 (555) 123-4567"
+                    className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    required
+                  />
                 </div>
-              </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">
+                    Whitelist Numbers (optional)
+                  </label>
+                  <textarea
+                    value={formData.whitelistNumbers}
+                    onChange={(e) => handleInputChange('whitelistNumbers', e.target.value)}
+                    placeholder="Enter phone numbers that should always be forwarded, one per line"
+                    rows={3}
+                    className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">
+                    Special Instructions (optional)
+                  </label>
+                  <textarea
+                    value={formData.specialInstructions}
+                    onChange={(e) => handleInputChange('specialInstructions', e.target.value)}
+                    placeholder="Any special instructions for your AI agent..."
+                    rows={3}
+                    className="w-full p-3 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <CreditCard className="w-5 h-5 mr-2" />
+                    Purchase Number - $9/month
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
+
+          {/* My Numbers Section */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-black mb-6">My Numbers</h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card className="border-2 border-black bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-3">
+                      <Phone className="w-6 h-6 text-pink-500" />
+                      Primary Number
+                    </span>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <Settings className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-pink-500 mb-4">+1 (555) 123-4567</div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Status:</span>
+                      <span className="text-green-600 font-semibold">Active</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Calls Blocked:</span>
+                      <span>47</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Calls Forwarded:</span>
+                      <span>12</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Created:</span>
+                      <span>Jan 15, 2024</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

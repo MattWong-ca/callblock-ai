@@ -90,7 +90,7 @@ export default function CallLogsPage() {
   }
 
   const Sidebar = () => (
-    <div className="w-64 bg-white border-r-2 border-black min-h-[calc(100vh-80px)] ">
+    <div className="w-64 bg-white border-r-2 border-black h-screen fixed left-0 z-50">
       <div className="p-6">
         <nav className="space-y-2">
           <Link href="/dashboard" className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors">
@@ -116,7 +116,7 @@ export default function CallLogsPage() {
         <Sidebar />
         
         {/* Call Logs content */}
-        <div className="flex-1 p-16">
+        <div className="flex-1 p-16 ml-64 overflow-y-auto h-screen">
           <div className="flex items-center justify-between mb-12">
             <div>
               <h1 className="text-4xl font-bold text-black mb-2">Call Logs</h1>

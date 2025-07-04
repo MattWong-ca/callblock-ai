@@ -39,7 +39,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className={`bg-black text-white px-6 py-4 sticky top-0 z-50 ${poppins.className}`}>
+    <nav className={`bg-black text-white px-6 py-4 sticky fixed top-0 z-50 ${poppins.className}`}>
       <div className="max-w-8xl mx-auto flex items-center justify-between">
         <Link href="/" className="text-xl font-bold hover:text-gray-300 transition-colors">
           CallBlock.ai
