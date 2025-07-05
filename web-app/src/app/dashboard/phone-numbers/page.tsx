@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Wallet, Phone, LayoutDashboard, FileText, Settings, CreditCard, AlertTriangle, CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { getAvailableNumbers, getNumberByPhoneNumber, type PhoneNumber } from "@/data/phoneNumbers"
 
 // Network specific configurations
 const NETWORK_CONFIG = {
@@ -124,8 +125,35 @@ export default function PhoneNumbersPage() {
       setCreatingAgent(true)
       
       try {
-        const g = await createVapiAssistant(formData.agentName, formData.realNumber, formData.whitelistNumbers || 'N/A', formData.specialInstructions || 'N/A')
-        console.log('Vapi assistant created:', g);
+        const assistantResponse = await createVapiAssistant(formData.agentName, formData.realNumber, formData.whitelistNumbers || 'N/A', formData.specialInstructions || 'N/A')
+        console.log('Vapi assistant created:', assistantResponse);
+        
+        // Get the selected phone number data
+        const selectedPhoneNumber = getNumberByPhoneNumber(formData.proxyNumber);
+        if (!selectedPhoneNumber) {
+          throw new Error('Selected phone number not found');
+        }
+        
+        // Associate the phone number with the assistant
+        const associateResponse = await fetch("/api/associate-phone", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            phoneNumberId: selectedPhoneNumber.vapi_id,
+            assistantId: assistantResponse.id
+          })
+        });
+        
+        if (!associateResponse.ok) {
+          const errorData = await associateResponse.json();
+          throw new Error(errorData.error || 'Failed to associate phone number');
+        }
+        
+        const associateData = await associateResponse.json();
+        console.log('Phone number associated:', associateData);
+        
         setPurchased(true)
       } catch (error) {
         console.error('Error creating Vapi assistant:', error)
@@ -341,10 +369,11 @@ export default function PhoneNumbersPage() {
                       required
                     >
                       <option value="">Select a number</option>
-                      <option value="+1 (555) 111-2222">+1 (555) 111-2222</option>
-                      <option value="+1 (555) 333-4444">+1 (555) 333-4444</option>
-                      <option value="+1 (555) 555-6666">+1 (555) 555-6666</option>
-                      <option value="+1 (555) 777-8888">+1 (555) 777-8888</option>
+                      {getAvailableNumbers().map((phoneNumber: PhoneNumber) => (
+                        <option key={phoneNumber.id} value={phoneNumber.number}>
+                          {phoneNumber.number}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
