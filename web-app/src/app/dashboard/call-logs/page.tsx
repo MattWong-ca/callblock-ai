@@ -5,13 +5,25 @@ import { BrowserProvider } from 'ethers'
 import { Poppins } from "next/font/google"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, Shield, Phone, CheckCircle, LayoutDashboard, FileText, Search, Filter } from "lucide-react"
+import { Wallet, Shield, Phone, LayoutDashboard, FileText, Search, Filter } from "lucide-react"
 import Link from "next/link"
 
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 })
+
+interface Call {
+  endedAt: string;
+  analysis: {
+    summary?: string;
+    structuredData?: {
+      is_spam?: boolean;
+      is_spam_percent?: number;
+      call_reason?: string;
+    };
+  };
+}
 
 declare global {
   interface Window {
@@ -21,8 +33,11 @@ declare global {
 }
 
 export default function CallLogsPage() {
-  const [, setAddress] = useState<string>('')
+  const [address, setAddress] = useState<string>('')
   const [isConnected, setIsConnected] = useState(false)
+  const [calls, setCalls] = useState<Call[]>([])
+  const [loadingCalls, setLoadingCalls] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const connectWallet = async () => {
     try {
@@ -62,6 +77,72 @@ export default function CallLogsPage() {
     
     checkWalletConnection()
   }, [])
+
+  // Fetch calls when connected
+  useEffect(() => {
+    const fetchCalls = async () => {
+      if (isConnected && address) {
+        setLoadingCalls(true)
+        try {
+          // First get user's phone data to get assistant ID
+          const phoneResponse = await fetch(`/api/get-user-phone?walletAddress=${address}`)
+          if (phoneResponse.ok) {
+            const phoneData = await phoneResponse.json()
+            console.log('Phone data:', phoneData)
+            
+            if (phoneData.vapi_assistant_id) {
+              // Fetch calls using assistant ID
+              const callsResponse = await fetch(`/api/get-calls?assistantId=${phoneData.vapi_assistant_id}`)
+              if (callsResponse.ok) {
+                const callsData = await callsResponse.json()
+                console.log('Calls data:', callsData)
+                setCalls(callsData || [])
+              } else {
+                console.error('Failed to fetch calls')
+                setCalls([])
+              }
+            } else {
+              setCalls([])
+            }
+          } else {
+            setCalls([])
+          }
+        } catch (error) {
+          console.error('Error fetching calls:', error)
+          setCalls([])
+        } finally {
+          setLoadingCalls(false)
+        }
+      }
+    }
+    
+    fetchCalls()
+  }, [isConnected, address])
+
+  // Helper function to get time ago
+  const getTimeAgo = (date: Date): string => {
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60)
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600)
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`
+    } else {
+      const days = Math.floor(diffInSeconds / 86400)
+      return `${days} day${days > 1 ? 's' : ''} ago`
+    }
+  }
+
+  // Filter calls based on search term
+  const filteredCalls = calls.filter(call => {
+    const callReason = call.analysis?.structuredData?.call_reason || ''
+    return callReason.toLowerCase().includes(searchTerm.toLowerCase())
+  })
 
   if (!isConnected) {
     return (
@@ -128,6 +209,8 @@ export default function CallLogsPage() {
                 <input
                   type="text"
                   placeholder="Search calls..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
                 />
               </div>
@@ -144,82 +227,68 @@ export default function CallLogsPage() {
               <CardTitle>Recent Calls</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-red-50 border-l-4 border-red-500">
-                  <div className="flex items-center gap-4">
-                    <Shield className="w-6 h-6 text-red-500" />
-                    <div>
-                      <div className="font-semibold text-red-700">Spam Call Blocked</div>
-                      <div className="text-sm text-gray-600">+1 (555) 999-8888 • 2 hours ago</div>
-                      <div className="text-xs text-gray-500">AI Confidence: 98%</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-red-700">BLOCKED</div>
-                    <div className="text-xs text-gray-500">0:00</div>
-                  </div>
+              {loadingCalls ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+                  <span className="ml-3 text-gray-600">Loading calls...</span>
                 </div>
-
-                <div className="flex items-center justify-between p-4 bg-green-50 border-l-4 border-green-500">
-                  <div className="flex items-center gap-4">
-                    <Phone className="w-6 h-6 text-green-500" />
-                    <div>
-                      <div className="font-semibold text-green-700">Call Forwarded</div>
-                      <div className="text-sm text-gray-600">+1 (555) 123-4567 • 4 hours ago</div>
-                      <div className="text-xs text-gray-500">AI Confidence: 12%</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-green-700">FORWARDED</div>
-                    <div className="text-xs text-gray-500">2:34</div>
-                  </div>
+              ) : filteredCalls.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredCalls.map((call, index) => {
+                    const isSpam = call.analysis?.structuredData?.is_spam
+                    const spamPercent = call.analysis?.structuredData?.is_spam_percent || 0
+                    const callReason = call.analysis?.structuredData?.call_reason || 'Unknown'
+                    const endedAt = new Date(call.endedAt)
+                    const timeAgo = getTimeAgo(endedAt)
+                    
+                    return (
+                      <div 
+                        key={index}
+                        className={`flex items-center justify-between p-4 border-l-4 ${
+                          isSpam 
+                            ? 'bg-red-50 border-red-500' 
+                            : 'bg-green-50 border-green-500'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          {isSpam ? (
+                            <Shield className="w-6 h-6 text-red-500" />
+                          ) : (
+                            <Phone className="w-6 h-6 text-green-500" />
+                          )}
+                          <div>
+                            <div className={`font-semibold ${
+                              isSpam ? 'text-red-700' : 'text-green-700'
+                            }`}>
+                              {isSpam ? 'Spam Call Blocked' : 'Call Forwarded'}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {callReason} • {timeAgo}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              AI Confidence: {isSpam ? spamPercent : 100 - spamPercent}%
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-sm font-semibold ${
+                            isSpam ? 'text-red-700' : 'text-green-700'
+                          }`}>
+                            {isSpam ? 'BLOCKED' : 'FORWARDED'}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {timeAgo}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-
-                <div className="flex items-center justify-between p-4 bg-red-50 border-l-4 border-red-500">
-                  <div className="flex items-center gap-4">
-                    <Shield className="w-6 h-6 text-red-500" />
-                    <div>
-                      <div className="font-semibold text-red-700">Spam Call Blocked</div>
-                      <div className="text-sm text-gray-600">+1 (555) 777-6666 • 6 hours ago</div>
-                      <div className="text-xs text-gray-500">AI Confidence: 95%</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-red-700">BLOCKED</div>
-                    <div className="text-xs text-gray-500">0:00</div>
-                  </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  {searchTerm ? 'No calls match your search' : 'No calls found'}
                 </div>
-
-                <div className="flex items-center justify-between p-4 bg-green-50 border-l-4 border-green-500">
-                  <div className="flex items-center gap-4">
-                    <Phone className="w-6 h-6 text-green-500" />
-                    <div>
-                      <div className="font-semibold text-green-700">Call Forwarded</div>
-                      <div className="text-sm text-gray-600">+1 (555) 456-7890 • 8 hours ago</div>
-                      <div className="text-xs text-gray-500">AI Confidence: 8%</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-green-700">FORWARDED</div>
-                    <div className="text-xs text-gray-500">1:45</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-yellow-50 border-l-4 border-yellow-500">
-                  <div className="flex items-center gap-4">
-                    <CheckCircle className="w-6 h-6 text-yellow-500" />
-                    <div>
-                      <div className="font-semibold text-yellow-700">Call Screened</div>
-                      <div className="text-sm text-gray-600">+1 (555) 333-4444 • 12 hours ago</div>
-                      <div className="text-xs text-gray-500">AI Confidence: 65%</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-yellow-700">SCREENED</div>
-                    <div className="text-xs text-gray-500">0:15</div>
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>

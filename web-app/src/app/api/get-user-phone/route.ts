@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     const { data: user, error } = await supabase
       .from('users')
-      .select('phone_number, vapi_phone_id')
+      .select('phone_number, vapi_phone_id, vapi_assistant_id')
       .eq('wallet_address', walletAddress)
       .single()
 
@@ -41,7 +41,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       phone_number: user.phone_number,
-      vapi_phone_id: user.vapi_phone_id
+      vapi_phone_id: user.vapi_phone_id,
+      vapi_assistant_id: user.vapi_assistant_id
     })
 
   } catch (error) {

@@ -33,6 +33,25 @@ const formatPhoneNumber = (phoneNumber: string): string => {
   return phoneNumber
 }
 
+// Helper function to get time ago
+const getTimeAgo = (date: Date): string => {
+  const now = new Date()
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+  
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} seconds ago`
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60)
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600)
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`
+  } else {
+    const days = Math.floor(diffInSeconds / 86400)
+    return `${days} day${days > 1 ? 's' : ''} ago`
+  }
+}
+
 declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,6 +64,20 @@ export default function DashboardPage() {
   const [isConnected, setIsConnected] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState<string>('')
   const [loadingPhone, setLoadingPhone] = useState(false)
+  interface Call {
+    endedAt: string;
+    analysis: {
+      summary?: string;
+      structuredData?: {
+        is_spam?: boolean;
+        is_spam_percent?: number;
+        call_reason?: string;
+      };
+    };
+  }
+  
+  const [calls, setCalls] = useState<Call[]>([])
+  const [loadingCalls, setLoadingCalls] = useState(false)
 
   const connectWallet = async () => {
     try {
@@ -96,6 +129,11 @@ export default function DashboardPage() {
             const data = await response.json()
             console.log(data)
             setPhoneNumber(data.phone_number)
+            
+            // If we have a Vapi phone ID, fetch the calls
+            if (data.vapi_assistant_id) {
+              await fetchCalls(data.vapi_assistant_id)
+            }
           } else {
             setPhoneNumber('No number assigned')
           }
@@ -110,6 +148,27 @@ export default function DashboardPage() {
     
     fetchPhoneNumber()
   }, [isConnected, address])
+
+  // Function to fetch calls from Vapi
+  const fetchCalls = async (assistantId: string) => {
+    setLoadingCalls(true)
+    try {
+      const response = await fetch(`/api/get-calls?assistantId=${assistantId}`)
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Calls data:', data)
+        setCalls(data || [])
+      } else {
+        console.error('Failed to fetch calls')
+        setCalls([])
+      }
+    } catch (error) {
+      console.error('Error fetching calls:', error)
+      setCalls([])
+    } finally {
+      setLoadingCalls(false)
+    }
+  }
 
   if (!isConnected) {
     return (
@@ -232,29 +291,58 @@ export default function DashboardPage() {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-red-50 border-l-4 border-red-500">
-                <div>
-                  <div className="font-semibold text-red-700">Spam Call Blocked</div>
-                  <div className="text-sm text-gray-600">+1 (555) 999-8888 • 2 hours ago</div>
-                </div>
-                <Shield className="w-5 h-5 text-red-500" />
+            {loadingCalls ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+                <span className="ml-3 text-gray-600">Loading calls...</span>
               </div>
-              <div className="flex items-center justify-between p-4 bg-green-50 border-l-4 border-green-500">
-                <div>
-                  <div className="font-semibold text-green-700">Call Forwarded</div>
-                  <div className="text-sm text-gray-600">+1 (555) 123-4567 • 4 hours ago</div>
-                </div>
-                <Phone className="w-5 h-5 text-green-500" />
+            ) : calls.length > 0 ? (
+              <div className="space-y-4">
+                {calls.slice(0, 5).map((call, index) => {
+                  const isSpam = call.analysis?.structuredData?.is_spam
+                  const spamPercent = call.analysis?.structuredData?.is_spam_percent || 0
+                  const callReason = call.analysis?.structuredData?.call_reason || 'Unknown'
+                  const endedAt = new Date(call.endedAt)
+                  const timeAgo = getTimeAgo(endedAt)
+                  
+                  return (
+                    <div 
+                      key={index}
+                      className={`flex items-center justify-between p-4 border-l-4 ${
+                        isSpam 
+                          ? 'bg-red-50 border-red-500' 
+                          : 'bg-green-50 border-green-500'
+                      }`}
+                    >
+                      <div>
+                        <div className={`font-semibold ${
+                          isSpam ? 'text-red-700' : 'text-green-700'
+                        }`}>
+                          {isSpam ? 'Spam Call Blocked' : 'Call Forwarded'}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {callReason} • {timeAgo}
+                        </div>
+                        {isSpam && (
+                          <div className="text-xs text-red-600 mt-1">
+                            Spam likelihood: {spamPercent}%
+                          </div>
+                        )}
+                      </div>
+                      {isSpam ? (
+                        <Shield className="w-5 h-5 text-red-500" />
+                      ) : (
+                        <Phone className="w-5 h-5 text-green-500" />
+                      )}
+                    </div>
+                  )
+                })}
               </div>
-              <div className="flex items-center justify-between p-4 bg-red-50 border-l-4 border-red-500">
-                <div>
-                  <div className="font-semibold text-red-700">Spam Call Blocked</div>
-                  <div className="text-sm text-gray-600">+1 (555) 777-6666 • 6 hours ago</div>
-                </div>
-                <Shield className="w-5 h-5 text-red-500" />
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No recent calls found
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
         </div>
