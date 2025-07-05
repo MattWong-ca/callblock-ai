@@ -54,6 +54,7 @@ export default function PhoneNumbersPage() {
   const [networkConfig, setNetworkConfig] = useState<typeof NETWORK_CONFIG["0x221"] | null>(null)
   const [loading, setLoading] = useState(false)
   const [purchased, setPurchased] = useState(false)
+  const [creatingAgent, setCreatingAgent] = useState(false)
   const [formData, setFormData] = useState({
     agentName: '',
     proxyNumber: '',
@@ -118,8 +119,20 @@ export default function PhoneNumbersPage() {
 
       await tx.wait()
       
-      // Success! Set purchased state to true
-      setPurchased(true)
+      // Purchase successful! Now create Vapi assistant
+      setLoading(false)
+      setCreatingAgent(true)
+      
+      try {
+        const g = await createVapiAssistant(formData.agentName, formData.realNumber, formData.whitelistNumbers || 'N/A', formData.specialInstructions || 'N/A')
+        console.log('Vapi assistant created:', g);
+        setPurchased(true)
+      } catch (error) {
+        console.error('Error creating Vapi assistant:', error)
+        alert('Purchase successful but failed to create AI agent. Please contact support.')
+      } finally {
+        setCreatingAgent(false)
+      }
       
       // Reset form or redirect
     //   setFormData({
@@ -135,6 +148,34 @@ export default function PhoneNumbersPage() {
       alert('Error processing purchase. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const createVapiAssistant = async (agentName: string, realNumber: string, whitelistNumbers: string, specialInstructions: string) => {
+    try {
+      const response = await fetch("/api/create-assistant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          agentName,
+          realNumber,
+          whitelistNumbers,
+          specialInstructions
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create assistant');
+      }
+
+      const body = await response.json();
+      return body;
+    } catch (error) {
+      console.error('Error creating Vapi assistant:', error);
+      throw error;
     }
   }
 
@@ -353,6 +394,11 @@ export default function PhoneNumbersPage() {
                     <div className="flex items-center gap-2 text-green-600 font-semibold text-lg">
                       <CheckCircle className="w-6 h-6" />
                       Purchased
+                    </div>
+                  ) : creatingAgent ? (
+                    <div className="flex items-center gap-2 text-blue-600 font-semibold text-lg">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                      Creating AI agent...
                     </div>
                   ) : (
                     <Button
