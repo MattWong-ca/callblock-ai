@@ -56,6 +56,7 @@ export default function PhoneNumbersPage() {
   const [loading, setLoading] = useState(false)
   const [purchased, setPurchased] = useState(false)
   const [creatingAgent, setCreatingAgent] = useState(false)
+  const [updatingNumber, setUpdatingNumber] = useState(false)
   const [formData, setFormData] = useState({
     agentName: '',
     proxyNumber: '',
@@ -128,6 +129,10 @@ export default function PhoneNumbersPage() {
         const assistantResponse = await createVapiAssistant(formData.agentName, formData.realNumber, formData.whitelistNumbers || 'N/A', formData.specialInstructions || 'N/A')
         console.log('Vapi assistant created:', assistantResponse);
         
+        // Switch to updating number state
+        setCreatingAgent(false)
+        setUpdatingNumber(true)
+        
         // Get the selected phone number data
         const selectedPhoneNumber = getNumberByPhoneNumber(formData.proxyNumber);
         if (!selectedPhoneNumber) {
@@ -159,17 +164,8 @@ export default function PhoneNumbersPage() {
         console.error('Error creating Vapi assistant:', error)
         alert('Purchase successful but failed to create AI agent. Please contact support.')
       } finally {
-        setCreatingAgent(false)
+        setUpdatingNumber(false)
       }
-      
-      // Reset form or redirect
-    //   setFormData({
-    //     agentName: '',
-    //     proxyNumber: '',
-    //     realNumber: '',
-    //     whitelistNumbers: '',
-    //     specialInstructions: ''
-    //   })
       
     } catch (error) {
       console.error('Purchase error:', error)
@@ -428,6 +424,11 @@ export default function PhoneNumbersPage() {
                     <div className="flex items-center gap-2 text-blue-600 font-semibold text-lg">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                       Creating AI agent...
+                    </div>
+                  ) : updatingNumber ? (
+                    <div className="flex items-center gap-2 text-blue-600 font-semibold text-lg">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                      Updating number...
                     </div>
                   ) : (
                     <Button
