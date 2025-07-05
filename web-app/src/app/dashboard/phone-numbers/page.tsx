@@ -9,6 +9,26 @@ import { Wallet, Phone, LayoutDashboard, FileText, Settings, CreditCard, AlertTr
 import Link from "next/link"
 import { getAvailableNumbers, getNumberByPhoneNumber, type PhoneNumber } from "@/data/phoneNumbers"
 
+// Helper function to format phone number
+const formatPhoneNumber = (phoneNumber: string): string => {
+  if (!phoneNumber) return 'No number assigned'
+  
+  // Remove all non-digits
+  const cleaned = phoneNumber.replace(/\D/g, '')
+  
+  // Check if it's a US number (10 or 11 digits)
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    // Format: +1 (123) 456-7890
+    return `+1 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`
+  } else if (cleaned.length === 10) {
+    // Format: +1 (123) 456-7890
+    return `+1 (${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`
+  }
+  
+  // Return original if it doesn't match expected format
+  return phoneNumber
+}
+
 // Network specific configurations
 const NETWORK_CONFIG = {
   // Sepolia
@@ -57,6 +77,8 @@ export default function PhoneNumbersPage() {
   const [purchased, setPurchased] = useState(false)
   const [creatingAgent, setCreatingAgent] = useState(false)
   const [updatingNumber, setUpdatingNumber] = useState(false)
+  const [userPhoneNumber, setUserPhoneNumber] = useState<string>('')
+  const [loadingUserPhone, setLoadingUserPhone] = useState(false)
   const [formData, setFormData] = useState({
     agentName: '',
     proxyNumber: '',
@@ -276,6 +298,32 @@ export default function PhoneNumbersPage() {
     checkWalletConnection()
   }, [])
 
+  // Fetch user's phone number when connected
+  useEffect(() => {
+    const fetchUserPhoneNumber = async () => {
+      if (isConnected && address) {
+        setLoadingUserPhone(true)
+        try {
+          const response = await fetch(`/api/get-user-phone?walletAddress=${address}`)
+          if (response.ok) {
+            const data = await response.json()
+            console.log('User phone data:', data)
+            setUserPhoneNumber(data.phone_number || '')
+          } else {
+            setUserPhoneNumber('')
+          }
+        } catch (error) {
+          console.error('Error fetching user phone number:', error)
+          setUserPhoneNumber('')
+        } finally {
+          setLoadingUserPhone(false)
+        }
+      }
+    }
+    
+    fetchUserPhoneNumber()
+  }, [isConnected, address])
+
   if (!isConnected) {
     return (
       <div className={`min-h-[calc(100vh-80px)] bg-[#f5f3f0] ${poppins.className}`}>
@@ -487,23 +535,15 @@ export default function PhoneNumbersPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-pink-500 mb-4">+1 (555) 123-4567</div>
+                  <div className="text-2xl font-bold text-pink-500 mb-4">
+                    {loadingUserPhone ? 'Loading...' : formatPhoneNumber(userPhoneNumber)}
+                  </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Status:</span>
-                      <span className="text-green-600 font-semibold">Active</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Calls Blocked:</span>
-                      <span>47</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Calls Forwarded:</span>
-                      <span>12</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Created:</span>
-                      <span>Jan 15, 2024</span>
+                      <span className="text-green-600 font-semibold">
+                        {userPhoneNumber ? 'Active' : 'No number assigned'}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
