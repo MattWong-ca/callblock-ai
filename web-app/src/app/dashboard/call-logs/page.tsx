@@ -5,7 +5,7 @@ import { BrowserProvider } from 'ethers'
 import { Poppins } from "next/font/google"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, Shield, Phone, LayoutDashboard, FileText, Search, Filter } from "lucide-react"
+import { Wallet, Shield, Phone, LayoutDashboard, FileText, Search, Filter, Share2 } from "lucide-react"
 import Link from "next/link"
 
 const poppins = Poppins({
@@ -217,6 +217,10 @@ export default function CallLogsPage() {
               <Button variant="outline" className="border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <Filter className="w-4 h-4 mr-2" />
                 Filter
+              </Button>
+              <Button variant="outline" className="border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
               </Button>
             </div>
           </div>
