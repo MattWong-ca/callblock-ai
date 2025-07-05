@@ -38,6 +38,7 @@ export default function CallLogsPage() {
   const [calls, setCalls] = useState<Call[]>([])
   const [loadingCalls, setLoadingCalls] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [sharing, setSharing] = useState(false)
 
   const connectWallet = async () => {
     try {
@@ -144,6 +145,69 @@ export default function CallLogsPage() {
     return callReason.toLowerCase().includes(searchTerm.toLowerCase())
   })
 
+  // Function to handle sharing calls
+  const handleShare = async () => {
+    if (!address || calls.length === 0) {
+      alert('No calls to share')
+      return
+    }
+
+    setSharing(true)
+    try {
+      // First, get user ID from database
+      const userResponse = await fetch(`/api/get-user-phone?walletAddress=${address}`)
+      if (!userResponse.ok) {
+        throw new Error('Failed to get user data')
+      }
+      const userData = await userResponse.json()
+      console.log('User data:', userData)
+      
+      // Add calls to database
+      const addCallsResponse = await fetch('/api/add-calls', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: address,
+          calls: calls
+        })
+      })
+
+      if (!addCallsResponse.ok) {
+        throw new Error('Failed to add calls to database')
+      }
+
+      // Share calls to IPFS using Pinata
+      const shareResponse = await fetch('/api/share-calls', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: userData.id
+        })
+      })
+
+      if (!shareResponse.ok) {
+        throw new Error('Failed to share calls')
+      }
+
+      const shareData = await shareResponse.json()
+      
+      // Copy IPFS URL to clipboard
+      await navigator.clipboard.writeText(shareData.ipfsUrl)
+      
+      alert(`Calls shared successfully! IPFS URL copied to clipboard: ${shareData.ipfsUrl}`)
+      
+    } catch (error) {
+      console.error('Error sharing calls:', error)
+      alert('Failed to share calls. Please try again.')
+    } finally {
+      setSharing(false)
+    }
+  }
+
   if (!isConnected) {
     return (
       <div className={`min-h-[calc(100vh-80px)] bg-[#f5f3f0] ${poppins.className}`}>
@@ -218,9 +282,23 @@ export default function CallLogsPage() {
                 <Filter className="w-4 h-4 mr-2" />
                 Filter
               </Button>
-              <Button variant="outline" className="border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
+              <Button 
+                variant="outline" 
+                className="border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                onClick={handleShare}
+                // disabled={sharing}
+              >
+                {sharing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-pink-500 mr-2"></div>
+                    Sharing...
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share
+                  </>
+                )}
               </Button>
             </div>
           </div>
