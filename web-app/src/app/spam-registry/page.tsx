@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Poppins } from "next/font/google"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8,41 +11,122 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 })
 
-// Mock data - in real implementation this would come from IPFS
-const spamData = [
-  {
-    phoneNumber: "+1 (555) 999-8888",
-    lastReported: "2024-01-15",
-    reportCount: 47,
-    status: "high"
-  },
-  {
-    phoneNumber: "+1 (555) 777-6666",
-    lastReported: "2024-01-14",
-    reportCount: 23,
-    status: "medium"
-  },
-  {
-    phoneNumber: "+1 (555) 444-3333",
-    lastReported: "2024-01-13",
-    reportCount: 12,
-    status: "low"
-  },
-  {
-    phoneNumber: "+1 (555) 111-2222",
-    lastReported: "2024-01-12",
-    reportCount: 8,
-    status: "low"
-  },
-  {
-    phoneNumber: "+1 (555) 888-7777",
-    lastReported: "2024-01-11",
-    reportCount: 35,
-    status: "high"
+interface SpamCall {
+  phoneNumber: string
+  lastReported: string
+  reportCount: number
+  spamLikelihood: number
+  status: 'high' | 'medium' | 'low'
+}
+
+interface CallData {
+  type: string
+  endedAt: string
+  from?: string
+  customer?: {
+    number?: string
   }
-]
+  analysis?: {
+    structuredData?: {
+      is_spam?: boolean
+      is_spam_percent?: number
+    }
+  }
+}
 
 export default function SpamRegistryPage() {
+  const [spamData, setSpamData] = useState<SpamCall[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchSpamData = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('https://gateway.pinata.cloud/ipfs/bafkreifatpwvueb4b4has3awmh3bwcfgeephljskuudoybgiiczgamcapi')
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch spam data from IPFS')
+        }
+
+        const data = await response.json()
+        console.log('IPFS data:', data)
+
+        // Process calls to extract spam data
+        const spamCalls: SpamCall[] = []
+        
+        if (data.calls && Array.isArray(data.calls)) {
+            console.log('Calls:', data.calls)
+          data.calls.forEach((call: CallData) => {
+            // Check if it's an inbound phone call and marked as spam
+            if (call.type === 'inboundPhoneCall' && 
+                call.analysis?.structuredData?.is_spam === true) {
+              
+                              // Extract phone number from the call data
+                const rawPhoneNumber = call.customer?.number || call.from || 'Unknown'
+                
+                // Format to show only last 4 digits for privacy
+                const formatPhoneNumber = (phone: string): string => {
+                  if (phone === 'Unknown') return phone
+                  
+                  // Remove all non-digits
+                  const cleaned = phone.replace(/\D/g, '')
+                  
+                  if (cleaned.length >= 4) {
+                    const last4 = cleaned.slice(-4)
+                    return `***-***-${last4}`
+                  }
+                  
+                  return phone
+                }
+                
+                const phoneNumber = formatPhoneNumber(rawPhoneNumber)
+              
+              // Format the date
+              const lastReported = new Date(call.endedAt).toLocaleDateString()
+              
+              // Get spam likelihood percentage
+              const spamLikelihood = call.analysis?.structuredData?.is_spam_percent || 0
+              
+              // Determine status based on spam likelihood
+              let status: 'high' | 'medium' | 'low'
+              if (spamLikelihood >= 80) {
+                status = 'high'
+              } else if (spamLikelihood >= 50) {
+                status = 'medium'
+              } else {
+                status = 'low'
+              }
+
+              spamCalls.push({
+                phoneNumber,
+                lastReported,
+                reportCount: 1, // Each call is one report
+                spamLikelihood,
+                status
+              })
+            }
+          })
+        }
+
+        setSpamData(spamCalls)
+        setError(null)
+      } catch (err) {
+        console.error('Error fetching spam data:', err)
+        setError('Failed to load spam registry data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSpamData()
+  }, [])
+
+  // Filter spam data based on search term
+  const filteredSpamData = spamData.filter(item =>
+    item.phoneNumber.toLowerCase().includes(searchTerm.toLowerCase())
+  )
   return (
     <div className={`min-h-[calc(100vh-80px)] bg-[#f5f3f0] ${poppins.className}`}>
       
@@ -62,6 +146,8 @@ export default function SpamRegistryPage() {
               <input
                 type="text"
                 placeholder="Search phone numbers..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border-2 border-black rounded-none focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
@@ -84,46 +170,68 @@ export default function SpamRegistryPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-black">
-                    <th className="text-left py-4 px-6 font-semibold text-black">Phone Number</th>
-                    <th className="text-left py-4 px-6 font-semibold text-black">Last Reported</th>
-                    <th className="text-left py-4 px-6 font-semibold text-black">Reports</th>
-                    <th className="text-left py-4 px-6 font-semibold text-black">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {spamData.map((item, index) => (
-                    <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                      <td className="py-4 px-6 font-mono text-lg">
-                        {item.phoneNumber}
-                      </td>
-                      <td className="py-4 px-6 text-gray-700">
-                        {item.lastReported}
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className="font-semibold text-pink-500">
-                          {item.reportCount}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`px-3 py-1 text-xs font-semibold rounded-none ${
-                          item.status === 'high' 
-                            ? 'bg-red-100 text-red-700 border border-red-300' 
-                            : item.status === 'medium'
-                            ? 'bg-yellow-100 text-yellow-700 border border-yellow-300'
-                            : 'bg-green-100 text-green-700 border border-green-300'
-                        }`}>
-                          {item.status.toUpperCase()}
-                        </span>
-                      </td>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+                <span className="ml-3 text-gray-600">Loading spam registry...</span>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-red-600">
+                <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
+                <p>{error}</p>
+              </div>
+            ) : filteredSpamData.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b-2 border-black">
+                      <th className="text-left py-4 px-6 font-semibold text-black">Phone Number</th>
+                      <th className="text-left py-4 px-6 font-semibold text-black">Last Reported</th>
+                      <th className="text-left py-4 px-6 font-semibold text-black">Reports</th>
+                      <th className="text-left py-4 px-6 font-semibold text-black">Spam Likelihood</th>
+                      <th className="text-left py-4 px-6 font-semibold text-black">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {filteredSpamData.map((item, index) => (
+                      <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="py-4 px-6 font-mono text-lg">
+                          {item.phoneNumber}
+                        </td>
+                        <td className="py-4 px-6 text-gray-700">
+                          {item.lastReported}
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="font-semibold text-pink-500">
+                            {item.reportCount}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="font-semibold text-gray-700">
+                            {item.spamLikelihood}%
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`px-3 py-1 text-xs font-semibold rounded-none ${
+                            item.status === 'high' 
+                              ? 'bg-red-100 text-red-700 border border-red-300' 
+                              : item.status === 'medium'
+                              ? 'bg-yellow-100 text-yellow-700 border border-yellow-300'
+                              : 'bg-green-100 text-green-700 border border-green-300'
+                          }`}>
+                            {item.status.toUpperCase()}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                {searchTerm ? 'No spam numbers match your search' : 'No spam numbers found'}
+              </div>
+            )}
           </CardContent>
         </Card>
 
