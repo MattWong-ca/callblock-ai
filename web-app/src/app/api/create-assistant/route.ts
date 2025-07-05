@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
                     }
                 },
                 name: agentName,
+                endCallFunctionEnabled: true,
                 startSpeakingPlan: {
                     waitSeconds: 1.5
                 }

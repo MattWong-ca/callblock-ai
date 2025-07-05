@@ -19,7 +19,6 @@ export async function PATCH(request: NextRequest) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "provider": "vapi",
         "assistantId": assistantId
       })
     })

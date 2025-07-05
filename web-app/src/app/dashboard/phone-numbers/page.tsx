@@ -49,7 +49,7 @@ declare global {
 }
 
 export default function PhoneNumbersPage() {
-  const [, setAddress] = useState<string>('')
+  const [address, setAddress] = useState<string>('')
   const [isConnected, setIsConnected] = useState(false)
   const [showFlowAlert, setShowFlowAlert] = useState(false)
   const [networkConfig, setNetworkConfig] = useState<typeof NETWORK_CONFIG["0x221"] | null>(null)
@@ -159,9 +159,32 @@ export default function PhoneNumbersPage() {
         const associateData = await associateResponse.json();
         console.log('Phone number associated:', associateData);
         
+        // Save all data to Supabase users table
+        const completePurchaseResponse = await fetch("/api/complete-purchase", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            walletAddress: address,
+            phoneNumber: formData.proxyNumber,
+            vapiPhoneId: selectedPhoneNumber.vapi_id,
+            vapiAssistantId: assistantResponse.id,
+            phoneRegion: 'US'
+          })
+        });
+        
+        if (!completePurchaseResponse.ok) {
+          const errorData = await completePurchaseResponse.json();
+          throw new Error(errorData.error || 'Failed to save purchase data');
+        }
+        
+        const purchaseData = await completePurchaseResponse.json();
+        console.log('Purchase data saved:', purchaseData);
+        
         setPurchased(true)
       } catch (error) {
-        console.error('Error creating Vapi assistant:', error)
+        console.error('Error:', error)
         alert('Purchase successful but failed to create AI agent. Please contact support.')
       } finally {
         setUpdatingNumber(false)
