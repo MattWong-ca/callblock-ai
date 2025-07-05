@@ -13,6 +13,26 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 })
 
+// Helper function to format phone number
+const formatPhoneNumber = (phoneNumber: string): string => {
+  if (!phoneNumber) return 'N/A'
+  
+  // Remove all non-digits
+  const cleaned = phoneNumber.replace(/\D/g, '')
+  
+  // Check if it's a US number (10 or 11 digits)
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    // Format: +1 (123) 456-7890
+    return `+1 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`
+  } else if (cleaned.length === 10) {
+    // Format: +1 (123) 456-7890
+    return `+1 (${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`
+  }
+  
+  // Return original if it doesn't match expected format
+  return phoneNumber
+}
+
 declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,6 +43,8 @@ declare global {
 export default function DashboardPage() {
   const [address, setAddress] = useState<string>('')
   const [isConnected, setIsConnected] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState<string>('')
+  const [loadingPhone, setLoadingPhone] = useState(false)
 
   const connectWallet = async () => {
     try {
@@ -62,6 +84,32 @@ export default function DashboardPage() {
     
     checkWalletConnection()
   }, [])
+
+  // Fetch user's phone number when connected
+  useEffect(() => {
+    const fetchPhoneNumber = async () => {
+      if (isConnected && address) {
+        setLoadingPhone(true)
+        try {
+          const response = await fetch(`/api/get-user-phone?walletAddress=${address}`)
+          if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            setPhoneNumber(data.phone_number)
+          } else {
+            setPhoneNumber('No number assigned')
+          }
+        } catch (error) {
+          console.error('Error fetching phone number:', error)
+          setPhoneNumber('No number assigned')
+        } finally {
+          setLoadingPhone(false)
+        }
+      }
+    }
+    
+    fetchPhoneNumber()
+  }, [isConnected, address])
 
   if (!isConnected) {
     return (
@@ -122,10 +170,12 @@ export default function DashboardPage() {
               <h1 className="text-4xl font-bold text-black mb-2">Welcome back!</h1>
               <p className="text-gray-700 text-lg">Connected: {address}</p>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-pink-500">+1 (555) 123-4567</div>
-              <div className="text-sm text-gray-600">Your AI Number</div>
-            </div>
+                          <div className="text-right">
+                <div className="text-2xl font-bold text-pink-500">
+                  {loadingPhone ? 'Loading...' : formatPhoneNumber(phoneNumber)}
+                </div>
+                <div className="text-sm text-gray-600">Your AI Number</div>
+              </div>
           </div>
 
         {/* Stats Cards */}
