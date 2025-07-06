@@ -28,7 +28,30 @@ Most importantly, CallBlock.AI is a secure phone screening system that restores 
 <img width="502" alt="Spam registry" src="https://github.com/user-attachments/assets/ab1c7b38-13ca-4631-bd1d-145058361a3b" />
 
 # How it works
-<img width="1121" alt="Screenshot 2025-07-06 at 2 09 58 PM" src="https://github.com/user-attachments/assets/3b483398-63fa-46ab-83ee-21cac52ab0ed" />
+
+Tools: v0, Cursor
+<br/>
+APIs: Vapi, Pinata, Supabase
+<br/>
+Blockchain: Flow, IPFS, Pinata, Ethers, Hardhat, Alchemy
+
+<img width="1121" alt="How it works" src="https://github.com/user-attachments/assets/3b483398-63fa-46ab-83ee-21cac52ab0ed" />
+<br/>
+
+**Vapi:**
+
+- For all voice AI related capabilities, like creating the phone numbers in the backend, the voice AI agents, as well as fetching call logs and detecting spam. For demo purposes the phone numbers are currently manually pre-bought, but this can be done through API depending on demand in the future.
+- The voice AI agents are unique and customizable for every user, enabling you to how lenient it is when screening calls. You can also add whitelist numbers that can bypass it.
+
+**Flow:**
+- Deployed the monthly subscription payments contract. Using crypto rails makes the platform globally accessible and also benefits onchain identity.
+- Contract: [0xE9f4bFA4f4351eDD69AB7cAab516bdc73aA29922](https://evm-testnet.flowscan.io/address/0xE9f4bFA4f4351eDD69AB7cAab516bdc73aA29922)
+
+**IPFS + Pinata:**
+-  Using the Pinata API to upload/fetch spam call numbers and info to/from the spam registry powered by IPFS.
+
+**Supabase:**
+- Associating the user's number with their AI proxy number offchain, as well as storing call logs and info from Vapi.
 
 # Team
 
