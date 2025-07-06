@@ -49,7 +49,7 @@ export default function LandingPage() {
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="bg-white p-8 rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] border-2 border-black">
-            <h2 className="text-3xl font-bold text-black mb-4">The Spam Problem</h2>
+            <h2 className="text-3xl font-bold text-black mb-4">Phone scams are on the rise</h2>
             <p className="text-gray-700 text-lg leading-relaxed">
               Americans lost $12.5 billion to phone scams in 2024. The average victim loses $1,400.<br /><br />Your number is likely already in a scammer&apos;s database.
             </p>
