@@ -247,9 +247,11 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-500">0</div>
+              <div className="text-3xl font-bold text-green-500">
+                {loadingCalls ? '...' : calls.filter(call => call.analysis?.structuredData?.is_spam).length}
+              </div>
               <CardDescription className="text-gray-700">
-                This month
+                Total blocked
               </CardDescription>
             </CardContent>
           </Card>
@@ -262,9 +264,11 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-500">0</div>
+              <div className="text-3xl font-bold text-blue-500">
+                {loadingCalls ? '...' : calls.filter(call => !call.analysis?.structuredData?.is_spam).length}
+              </div>
               <CardDescription className="text-gray-700">
-                This month
+                Total forwarded
               </CardDescription>
             </CardContent>
           </Card>
@@ -273,13 +277,15 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <CheckCircle className="w-6 h-6 text-pink-500" />
-                Protection Active
+                Total Calls
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-pink-500">24/7</div>
+              <div className="text-3xl font-bold text-pink-500">
+                {loadingCalls ? '...' : calls.length}
+              </div>
               <CardDescription className="text-gray-700">
-                Always protecting
+                All time
               </CardDescription>
             </CardContent>
           </Card>
