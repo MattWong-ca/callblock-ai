@@ -46,6 +46,7 @@ Blockchain: Flow, IPFS, Pinata, Ethers, Hardhat, Alchemy
 **Flow:**
 - Deployed the monthly subscription payments contract. Using crypto rails makes the platform globally accessible and also benefits onchain identity.
 - Contract: [0xE9f4bFA4f4351eDD69AB7cAab516bdc73aA29922](https://evm-testnet.flowscan.io/address/0xE9f4bFA4f4351eDD69AB7cAab516bdc73aA29922)
+- Deployed the Solidity smart contract using Hardhat and Alchemy, and used Ethers to interact with it in the frontend.
 
 **IPFS + Pinata:**
 -  Using the Pinata API to upload/fetch spam call numbers and info to/from the spam registry powered by IPFS.
