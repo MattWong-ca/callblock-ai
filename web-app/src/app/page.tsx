@@ -28,7 +28,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20 text-center relative z-10">
         <h1 className="text-6xl md:text-7xl font-bold text-black mt-20 mb-6 leading-tight">
-          AI phone numbers to prevent spams and scams
+          AI phone numbers to prevent spam and scams
         </h1>
         <p className="text-xl text-gray-700 mb-12 max-w-2xl mx-auto">
           Sign up for an AI proxy number that screens calls before they reach you
