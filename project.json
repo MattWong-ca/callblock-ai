@@ -1,15 +1,15 @@
 {
     "name": "CallBlock.AI",
     "tagline": "AI phone numbers to prevent spam and scams",
-    "description": "",
+    "description": "CallBlock.AI lets you create proxy phone numbers that can screen calls for spam and scams. Sign up for a number to use in public, and your custom AI assistant will screen every incoming call for you. Only if the call is legitimate, then will it be forwarded to you. The platform also features an IPFS-powered spam registry that serves as a public, tamper-proof record accessible for everyone, allowing the community to share and access verified spam numbers in a decentralized manner.",
     "team": [
         {
             "name": "Matthew Wong",
             "email": "matthew.yt.wong@gmail.com"
         }
     ],
-    "demo_url": "",
-    "video_url": "",
+    "demo_url": "https://www.callblock.ai",
+    "video_url": "https://youtu.be/x7BVqj6cVvA",
     "technologies": [
         "React",
         "Next.js",
