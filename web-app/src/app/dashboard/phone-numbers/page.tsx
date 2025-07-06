@@ -124,7 +124,7 @@ export default function PhoneNumbersPage() {
 
     // Check if wallet is whitelisted
     if (!WHITELISTED_ADDRESSES.includes(walletAddress)) {
-      alert('CallBlock.ai is still in beta.Your wallet address is not whitelisted, please DM @mattwong_ca to be added!')
+      alert('CallBlock.ai is still in beta. Your wallet address is not whitelisted, please DM @mattwong_ca to be added!')
       return
     }
 
