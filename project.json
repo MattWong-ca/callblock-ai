@@ -1,0 +1,26 @@
+{
+    "name": "CallBlock.AI",
+    "tagline": "AI phone numbers to prevent spam and scams",
+    "description": "",
+    "team": [
+        {
+            "name": "Matthew Wong",
+            "email": "matthew.yt.wong@gmail.com"
+        }
+    ],
+    "demo_url": "",
+    "video_url": "",
+    "technologies": [
+        "React",
+        "Next.js",
+        "Tailwind CSS",
+        "Shadcn UI",
+        "Vercel",
+        "Flow",
+        "Ethers.js",
+        "IPFS",
+        "Pinata",
+        "Supabase",
+        "Vapi APIs"
+    ]
+}
